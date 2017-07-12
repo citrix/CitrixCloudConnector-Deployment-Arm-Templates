@@ -90,10 +90,16 @@
         "description": "Private IP of Domain Controller, This is used to Join and Register CloudConnector to DomainController"
       }
     },
-	"cloudConnectorIP" :{
+	"cloudConnectorIP-1" :{
       "type": "string",      
       "metadata": {
-        "description": "Specify Private IP address that needs to be assigned for CloudConnector VM"
+        "description": "Specify Private IP address that needs to be assigned for CloudConnector VM - 1"
+      }
+	},
+	"cloudConnectorIP-2" :{
+      "type": "string",      
+      "metadata": {
+        "description": "Specify Private IP address that needs to be assigned for CloudConnector VM - 2"
       }
 	},
     "artifactsBaseUrl": {
@@ -102,13 +108,13 @@
         "artifactsBaseUrl": "",
         "description": "Specifies the base location of the child templates and desired state configuration scripts."
       },
-      "defaultValue": "https://raw.githubusercontent.com/simongdavies/cuddly-octo-fortnight/master"
+      "defaultValue": "https://github.com/citrix/CitrixCloudConnector-Deployment-Arm-Templates"
     },
     "artifactsBaseUrlSasToken": {
       "type": "securestring",
       "metadata": {
         "description": "Specifies the shared access signature token which provides access to the base artifacts location."
-      },
+      }, 
       "defaultValue": ""
     },
     "azureGov": {
@@ -176,13 +182,12 @@
 			"publisher": "MicrosoftWindowsServer",
 			"offer": "WindowsServer",
 			"sku": "2016-Datacenter",
-			"machineName": "CloudConnector",
-			"nicName": "CloudConnector",
-			"OSDiskName": "CloudConnectorOSDisk",
-			"fqdn": "[concat('cloudConnector', '.', parameters('domainName'))]",
+			"machineName1": "CloudConnector-1",
+			"privateIp1": "[parameters('cloudConnectorIP-1')]",			
+			"machineName2": "CloudConnector-2",
+			"privateIp2": "[parameters('cloudConnectorIP-2')]",
 			"machineSize": "[parameters('machineSize')]",		  
 			"location": "[resourceGroup().location]",
-			"privateIp": "[parameters('cloudConnectorIP')]",
 			"customerId": "[parameters('customer')]",
 			"clientId": "[parameters('clientID')]",
 			"ClientSecret": "[parameters('clientSecret')]",
@@ -244,7 +249,7 @@
       }
     },
     {
-      "name": "CreatingCloudConnector",
+      "name": "CreatingCloudConnector-1",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
@@ -273,10 +278,10 @@
             "value": "[variables('CloudConnectorSetting').machineSize]"
           },
           "machineName": {
-            "value": "[variables('CloudConnectorSetting').machineName]"
+            "value": "[variables('CloudConnectorSetting').machineName1]"
           },
           "privateIp": {
-            "value": "[variables('CloudConnectorSetting').privateIp]"
+            "value": "[variables('CloudConnectorSetting').privateIp1]"
           },
           "availabilitySetId": {
             "value": "[variables('availabilitySetId')]"
@@ -312,7 +317,7 @@
       }
     },
     {
-      "name": "CreatingCloudConnectorExtension",
+      "name": "CreatingCloudConnectorExtension-1",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
@@ -329,7 +334,7 @@
             "value": "[variables('CloudConnectorSetting').publisher]"
           },          
           "machineName": {
-            "value": "[variables('CloudConnectorSetting').machineName]"
+            "value": "[variables('CloudConnectorSetting').machineName1]"
           },                   
           // Credentials and domain
           "adminUsername": {
@@ -382,6 +387,146 @@
 		  }
         }
       }
-    }      
+    },
+    {
+      "name": "CreatingCloudConnector-2",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/CreatingStorageAccount",
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('CloudConnectorSetting').templateUri]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vhdStorageAccount": {
+            "value": "[variables('vhdStorageAccount')]"
+          },       
+          "publisher": {
+            "value": "[variables('CloudConnectorSetting').publisher]"
+          },
+          "offer": {
+            "value": "[variables('CloudConnectorSetting').offer]"
+          },
+          "sku": {
+            "value": "[variables('CloudConnectorSetting').sku]"
+          },
+          "machineSize": {
+            "value": "[variables('CloudConnectorSetting').machineSize]"
+          },
+          "machineName": {
+            "value": "[variables('CloudConnectorSetting').machineName2]"
+          },
+          "privateIp": {
+            "value": "[variables('CloudConnectorSetting').privateIp2]"
+          },
+          "availabilitySetId": {
+            "value": "[variables('availabilitySetId')]"
+          },
+          "subnetId": {
+            "value": "[variables('subnetId')]"
+          },                   
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },         
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "azureGov": {
+            "value": "[parameters('azureGov')]"
+          },
+		  "customerId": {
+            "value": "[variables('CloudConnectorSetting').customerId]"
+		  },
+		  "clientId": {
+            "value": "[variables('CloudConnectorSetting').clientId]"
+		  },
+		  "ClientSecret":{
+            "value":  "[variables('CloudConnectorSetting').ClientSecret]"
+		  },
+		  "ResourceLocationId":{
+            "value":  "[variables('CloudConnectorSetting').ResourceLocationId]"
+		  }
+        }
+      }
+    },
+    {
+      "name": "CreatingCloudConnectorExtension-2",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/CreatingCloudConnector"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('CloudConnectorSetting').ExtensionUri]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": { 
+          "publisher": {
+            "value": "[variables('CloudConnectorSetting').publisher]"
+          },          
+          "machineName": {
+            "value": "[variables('CloudConnectorSetting').machineName2]"
+          },                   
+          // Credentials and domain
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+		  "domainUsername": {
+            "value": "[parameters('domainUsername')]"
+          },
+		  "domainPassword": {
+            "value": "[parameters('domainPassword')]"
+          },
+          "domainControllerPrivateIp": {
+            "value": "[parameters('domainControllerIp')]"
+          },
+          "location": {
+            "value": "[variables('location')]"
+          },                   
+          "artifactsLocationSasToken": {
+            "value": "[variables('artifactsLocationSasToken')]"
+          },          
+          "configurationFileUrl": {
+            "value": "[variables('CloudConnectorSetting').configurationFileUrl]"
+          },
+          "configurationFunction": {
+            "value": "[variables('CloudConnectorSetting').configurationFunction]"
+          },          
+		  "customerId": {
+            "value": "[variables('CloudConnectorSetting').customerId]"
+		  },
+		  "clientId": {
+            "value": "[variables('CloudConnectorSetting').clientId]"
+		  },
+		  "ClientSecret":{
+            "value":  "[variables('CloudConnectorSetting').ClientSecret]"
+		  },
+		  "ResourceLocationId":{
+            "value":  "[variables('CloudConnectorSetting').ResourceLocationId]"
+		  },
+		  "CustomCloudConnectorScriptUri":{
+ 		   "value": "[parameters('customCloudConnectorScriptUri')]"
+		  },
+		  "CustomCloudConnectorScriptArgs" :{
+		   "value": "[parameters('customCloudConnectorScriptArgs')]"
+		  }
+        }
+      }
+    }   	
   ]  
 }
