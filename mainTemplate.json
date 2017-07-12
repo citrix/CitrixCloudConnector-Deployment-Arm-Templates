@@ -170,7 +170,7 @@
     
   "variables": {	  
   	  "imageType" : "Gallery",
-	  "vhdStorageAccount" : "[toLower(substring(concat('cloudconnector',uniqueString(subscription().subscriptionId,resourceGroup().id)), 0, 13))]",
+	  "vhdStorageAccount" : "[toLower(substring(concat('cloudconnect',uniqueString(subscription().subscriptionId,resourceGroup().id)), 0, 13))]",
       "vhdStorageGroup" : "[resourceGroup().name]",
 	  "location": "[resourceGroup().location]",
       "artifactsLocation": "[concat(parameters('artifactsBaseUrl'),'/')]",
@@ -182,9 +182,9 @@
 			"publisher": "MicrosoftWindowsServer",
 			"offer": "WindowsServer",
 			"sku": "2016-Datacenter",
-			"machineName1": "CloudConnector-1",
+			"machineName1": "CloudConnect-1",
 			"privateIp1": "[parameters('cloudConnectorIP-1')]",			
-			"machineName2": "CloudConnector-2",
+			"machineName2": "CloudConnect-2",
 			"privateIp2": "[parameters('cloudConnectorIP-2')]",
 			"machineSize": "[parameters('machineSize')]",		  
 			"location": "[resourceGroup().location]",
