@@ -1,0 +1,54 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  "artifactsBaseUrl" :{
+    "value": "https://kkuenterprisestorage.blob.core.windows.net/cctest20-stageartifacts"
+    },
+    "adminUsername": {
+      "value": "ctxadmin"
+    },
+    "adminPassword": {
+      "value": "Citrix123456!"
+    },
+    "machineSize": {
+      "value": "Standard_DS2_v2"
+    },
+   "azureGov": {  
+	  "value": "false"
+    },    
+	"customer": {
+      "value": "[YOUR_CITRIX_CLOUD_CUSTOMER_ID]"
+    },
+    "clientID": {
+      "value": "[YOUR_CITRIX_CLOUD_CLIENT_ID]"
+    },
+    "clientSecret": {
+      "value": "[YOUR_CITRIX_CLOUD_CLIENT_SECRET]"
+    },
+    "resourceLocationId": {
+      "value": "[CITRIX_CLOUD_RESOURCE_LOCATION_NAME]"
+    },
+	"vnetName":{
+	  "value": "[AZURE_VNET_NAME]"
+	},
+	"subnetName":{
+	  "value": "[AZURE_SUBNET_NAME]"
+	},
+	"domainName":{
+	  "value": "[YOUR_DOMAIN_NAME]"
+	},
+	"domainUsername":{
+	  "value": "[YOUR_DOMAIN_USER_NAME]"
+	},
+	"domainPassword":{
+	  "value": "[YOUR_DOMAIN_PASSWPRD]"
+	},
+	"cloudConnectorIP":{
+	  "value": "10.0.0.24"
+	},
+	"domainControllerIp":{
+	  "value": "[YOUR_DOMAIN_CONTROLLER_PRIVATE_IP]"
+	}
+  }
+}
