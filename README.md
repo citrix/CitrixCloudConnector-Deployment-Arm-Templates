@@ -1,8 +1,8 @@
 # Citrix Cloud Connector ARM Template
 
-This template creates a [Citrix Cloud Connector](https://docs.citrix.com/en-us/citrix-cloud/citrix-cloud-connector.html), (Citrix  a component with a collection of Windows services installed on Windows 2016 Server) within specfied Azure Resource Location.
+This template creates two Instance of [Citrix Cloud Connector](https://docs.citrix.com/en-us/citrix-cloud/citrix-cloud-connector.html) Virtual Machines, (Citrix Cloud Connector a component with a collection of Windows services installed on Windows 2016 Server) within specfied Azure Resource Location.
 
-The Connector serves as a channel for communication between Citrix Cloud and your Resource Locations enabling cloud management without requiring any complex networking or infrastructure configuration such as VPNs or IPSec tunnels. This removes all the hassle of managing delivery infrastructure. It enables you to manage and focus on the resources that provide the value to your end users.
+The Citrix cloud Connector serves as a channel for communication between Citrix Cloud and your Resource Locations enabling cloud management without requiring any complex networking or infrastructure configuration such as VPNs or IPSec tunnels. This removes all the hassle of managing delivery infrastructure. It enables you to manage and focus on the resources that provide the value to your end users.
 
 # Pre-Requisites
 
@@ -47,7 +47,8 @@ The Connector serves as a channel for communication between Citrix Cloud and you
 | domainUsername | Specifies the name Existing domain Username that will be used to Join Domain. | 
 | domainPassword | Specifies the Existing domain Password for Domain User that will be used to Join Domain. | 
 | domainControllerIp |	Private IP of Domain Controller, This is used to Join and Register CloudConnector to DomainController. |
-| cloudConnectorIP | Specify Private IP address that needs to be assigned for CloudConnector VM |
+| cloudConnectorIP-1 | Specify Private IP address that needs to be assigned for CloudConnector VM - 1 |
+| cloudConnectorIP-2 | Specify Private IP address that needs to be assigned for CloudConnector VM - 2 |
 | Customer | This is the customer ID available in the Citrix Cloud console on the API Access page (within Identity and Access Management). |
 | clientID | Found on the API Access page. This is the secure client ID an administrator can create.|
 | clientSecret | Found on the API Access page. This is the secure client secret available via download after a secure client is created. |
