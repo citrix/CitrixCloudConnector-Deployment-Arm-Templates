@@ -25,7 +25,7 @@ The [Citrix cloud Connector](https://docs.citrix.com/en-us/citrix-cloud/citrix-c
 
 # Click the button below to deploy
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcitrix%2FCitrixCloudConnector-Deployment-Arm-Templates%2Fmaster%2FmainTemplate.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%253A%252F%252Fraw.githubusercontent.com%252Fcitrix%252FCitrixCloudConnector-Deployment-Arm-Templates%252Fmaster%252FmainTemplate.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
