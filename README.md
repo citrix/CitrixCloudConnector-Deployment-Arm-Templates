@@ -1,8 +1,8 @@
 # Citrix Cloud Connector ARM Template
 
-This template creates two Instance of [Citrix Cloud Connector](https://docs.citrix.com/en-us/citrix-cloud/citrix-cloud-connector.html) Virtual Machines, (Citrix Cloud Connector a component with a collection of Windows services installed on Windows 2016 Server) within specfied Azure Resource Location.
+This template creates two Instance of [Citrix Cloud Connector](https://docs.citrix.com/en-us/citrix-cloud/citrix-cloud-connector.html) Virtual Machines, (A component with a collection of Windows services installed on Windows 2016 Server) within specfied Azure Resource Location.
 
-The Citrix cloud Connector serves as a channel for communication between Citrix Cloud and your Resource Locations enabling cloud management without requiring any complex networking or infrastructure configuration such as VPNs or IPSec tunnels. This removes all the hassle of managing delivery infrastructure. It enables you to manage and focus on the resources that provide the value to your end users.
+The [Citrix cloud Connector](https://docs.citrix.com/en-us/citrix-cloud/citrix-cloud-connector.html) serves as a channel for communication between Citrix Cloud and your Resource Locations enabling cloud management without requiring any complex networking or infrastructure configuration such as VPNs or IPSec tunnels. This removes all the hassle of managing delivery infrastructure. It enables you to manage and focus on the resources that provide the value to your end users.
 
 # Pre-Requisites
 
