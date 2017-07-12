@@ -44,8 +44,11 @@
 	"domainPassword":{
 	  "value": "[YOUR_DOMAIN_PASSWPRD]"
 	},
-	"cloudConnectorIP":{
+	"cloudConnectorIP-1":{
 	  "value": "10.0.0.24"
+	},
+	"cloudConnectorIP-2":{
+	  "value": "10.0.0.25"
 	},
 	"domainControllerIp":{
 	  "value": "[YOUR_DOMAIN_CONTROLLER_PRIVATE_IP]"

@@ -321,7 +321,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "Microsoft.Resources/deployments/CreatingCloudConnector"
+        "Microsoft.Resources/deployments/CreatingCloudConnector-1"
       ],
       "properties": {
         "mode": "Incremental",
@@ -461,7 +461,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "Microsoft.Resources/deployments/CreatingCloudConnector"
+        "Microsoft.Resources/deployments/CreatingCloudConnector-2"
       ],
       "properties": {
         "mode": "Incremental",
