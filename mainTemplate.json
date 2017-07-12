@@ -1,0 +1,387 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {    
+    "vhdStorageType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "Specifies the type of storage account, if being created."
+      }
+    },    
+    "vhdStorageNewOrExisting": {
+      "type": "string",
+      "defaultValue": "new",
+      "allowedValues": [
+        "new",
+        "existing"
+      ],
+      "metadata": {
+        "description": "Specifies whether the storage account should be created or already exists."
+      }
+    },
+    "userImageContainerName": {
+      "type": "string",
+      "defaultValue": "ctxcloudconn",
+      "metadata": {
+        "description": "Specifies a storage container in the account specified by 'vhdStorageAccount' in which user images of XenApp 7.7 reside."
+      }
+    },	
+    "machineSize": {
+      "type": "string",
+      "defaultValue": "Standard_A2",
+      "metadata": {
+        "description": "Specifies the size of the virtual machines (6)."
+      }
+    },  
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the administrator for machines, Active Directory domain, NetScaler and XenApp. Exclusion list: 'admin','administrator'. Must be no more than 9 alphanumeric characters."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the password of the administrator for machines, Active Directory domain, NetScaler and XenApp."
+      }
+    },	
+	  "vnetName": {
+      "type": "string",      
+      "metadata": {
+        "description": "VirtualNetwork Name in which the CloudConnector will be Installed."
+      }
+    },
+	"subnetName": {
+      "type": "string",      
+      "metadata": {
+        "description": "Subnet Name under which the CloudConnector will be installed."
+      }
+    },
+	
+    "domainName": {
+      "type": "string",      
+      "metadata": {
+        "description": "Specifies the name of the newly created Active Directory domain."
+      }
+    },
+	"domainUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name Existing domain Username that will be used to Join Domain."
+      }
+    },
+    "domainPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the Existing domain Password for Domain User that will be used to Join Domain."
+      }
+    },
+	"domainControllerIp": {
+      "type": "string",      
+      "metadata": {
+        "description": "Private IP of Domain Controller, This is used to Join and Register CloudConnector to DomainController"
+      }
+    },
+	"cloudConnectorIP" :{
+      "type": "string",      
+      "metadata": {
+        "description": "Specify Private IP address that needs to be assigned for CloudConnector VM"
+      }
+	},
+    "artifactsBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "artifactsBaseUrl": "",
+        "description": "Specifies the base location of the child templates and desired state configuration scripts."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/simongdavies/cuddly-octo-fortnight/master"
+    },
+    "artifactsBaseUrlSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the shared access signature token which provides access to the base artifacts location."
+      },
+      "defaultValue": ""
+    },
+    "azureGov": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the shared access signature token which provides access to the base artifacts location."
+      },
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "customer": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the customer ID available in the Citrix Cloud console on the API Access page (within Identity and Access Management)."
+      }
+    },
+    "clientID": {
+      "type": "string",
+      "metadata": {
+        "description": "Found on the API Access page. This is the secure client ID an administrator can create."
+      }
+    },
+    "clientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "Found on the API Access page. This is the secure client secret available via download after a secure client is created."
+      }
+    },
+    "resourceLocationId": {
+      "type": "string",
+      "metadata": {
+        "description": "This ID can be retrieved on the Resource Locations page using the ID button."
+      }
+    }, 
+    "customCloudConnectorScriptUri": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "If there is custom Script that needs to run on Connector."
+      }
+    },
+    "customCloudConnectorScriptArgs": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "If there any Arguments that needs to be passed to script."
+      }
+    }
+  },
+    
+  "variables": {	  
+  	  "imageType" : "Gallery",
+	  "vhdStorageAccount" : "[toLower(substring(concat('cloudconnector',uniqueString(subscription().subscriptionId,resourceGroup().id)), 0, 13))]",
+      "vhdStorageGroup" : "[resourceGroup().name]",
+	  "location": "[resourceGroup().location]",
+      "artifactsLocation": "[concat(parameters('artifactsBaseUrl'),'/')]",
+      "artifactsLocationSasToken": "[parameters('artifactsBaseUrlSasToken')]",
+      "CloudConnectorSetting": {
+			"templateUri": "[concat(variables('artifactsLocation'), 'creatingCloudConnector', variables('imageType'), '.json')]",
+			"extensionUri": "[concat(variables('artifactsLocation'), 'creatingCloudConnectorGalleryExtension.json')]",
+			"userImageUri" : "",
+			"publisher": "MicrosoftWindowsServer",
+			"offer": "WindowsServer",
+			"sku": "2016-Datacenter",
+			"machineName": "CloudConnector",
+			"nicName": "CloudConnector",
+			"OSDiskName": "CloudConnectorOSDisk",
+			"fqdn": "[concat('cloudConnector', '.', parameters('domainName'))]",
+			"machineSize": "[parameters('machineSize')]",		  
+			"location": "[resourceGroup().location]",
+			"privateIp": "[parameters('cloudConnectorIP')]",
+			"customerId": "[parameters('customer')]",
+			"clientId": "[parameters('clientID')]",
+			"ClientSecret": "[parameters('clientSecret')]",
+			"ResourceLocationId": "[parameters('resourceLocationId')]",
+			"configurationFileUrl": "[concat(variables('artifactsLocation'), 'DSC/CitrixCloudConnector.ps1.zip')]",
+			"configurationFunction": "CitrixCloudConnector.ps1\\CitrixCloudConnector",
+			"prepareConfigurationFileUrl": "[concat(variables('artifactsLocation'), 'DSC/CitrixCloudConnector.ps1.zip')]",
+			"prepareConfigurationFunction": "CitrixCloudConnector.ps1.ps1\\CitrixCloudConnector"
+        },
+		"userImageContainerName": "[parameters('userImageContainerName')]",
+		"userImageLocation": "[concat('http://', variables('vhdStorageAccount'), '.blob.core.windows.net/', variables('userImageContainerName'), '/')]",
+		"vnetName": "[parameters('vnetName')]",
+		"subnetName": "[parameters('subnetName')]",
+		"subnetId": "[concat(resourceId('Microsoft.Network/virtualNetworks',variables('vnetName')), '/subnets/', variables('subnetName'))]",
+		"creatingStorageAccountUrl": "[concat(variables('artifactsLocation'), 'storageAccount-', parameters('vhdStorageNewOrExisting'), '.json')]",
+		"availabilitySetName": "CloudConnectorAvailabilitySet",
+		"availabilitySetId": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]",
+	},	   	  
+    
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "name": "[variables('availabilitySetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "location": "[variables('location')]",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "AvailabilitySet"
+      },
+      "properties": {
+        "platformFaultDomainCount": 2
+      }
+    },   
+    {
+      "name": "CreatingStorageAccount",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [ ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('creatingStorageAccountUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "vhdStorageAccount": {
+            "value": "[variables('vhdStorageAccount')]"
+          },
+          "vhdStorageType": {
+            "value": "[parameters('vhdStorageType')]"
+          },
+          "vhdStorageGroup": {
+            "value": "[variables('vhdStorageGroup')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "CreatingCloudConnector",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/CreatingStorageAccount",
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('CloudConnectorSetting').templateUri]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vhdStorageAccount": {
+            "value": "[variables('vhdStorageAccount')]"
+          },       
+          "publisher": {
+            "value": "[variables('CloudConnectorSetting').publisher]"
+          },
+          "offer": {
+            "value": "[variables('CloudConnectorSetting').offer]"
+          },
+          "sku": {
+            "value": "[variables('CloudConnectorSetting').sku]"
+          },
+          "machineSize": {
+            "value": "[variables('CloudConnectorSetting').machineSize]"
+          },
+          "machineName": {
+            "value": "[variables('CloudConnectorSetting').machineName]"
+          },
+          "privateIp": {
+            "value": "[variables('CloudConnectorSetting').privateIp]"
+          },
+          "availabilitySetId": {
+            "value": "[variables('availabilitySetId')]"
+          },
+          "subnetId": {
+            "value": "[variables('subnetId')]"
+          },                   
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },         
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "azureGov": {
+            "value": "[parameters('azureGov')]"
+          },
+		  "customerId": {
+            "value": "[variables('CloudConnectorSetting').customerId]"
+		  },
+		  "clientId": {
+            "value": "[variables('CloudConnectorSetting').clientId]"
+		  },
+		  "ClientSecret":{
+            "value":  "[variables('CloudConnectorSetting').ClientSecret]"
+		  },
+		  "ResourceLocationId":{
+            "value":  "[variables('CloudConnectorSetting').ResourceLocationId]"
+		  }
+        }
+      }
+    },
+    {
+      "name": "CreatingCloudConnectorExtension",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/CreatingCloudConnector"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('CloudConnectorSetting').ExtensionUri]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": { 
+          "publisher": {
+            "value": "[variables('CloudConnectorSetting').publisher]"
+          },          
+          "machineName": {
+            "value": "[variables('CloudConnectorSetting').machineName]"
+          },                   
+          // Credentials and domain
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+		  "domainUsername": {
+            "value": "[parameters('domainUsername')]"
+          },
+		  "domainPassword": {
+            "value": "[parameters('domainPassword')]"
+          },
+          "domainControllerPrivateIp": {
+            "value": "[parameters('domainControllerIp')]"
+          },
+          "location": {
+            "value": "[variables('location')]"
+          },                   
+          "artifactsLocationSasToken": {
+            "value": "[variables('artifactsLocationSasToken')]"
+          },          
+          "configurationFileUrl": {
+            "value": "[variables('CloudConnectorSetting').configurationFileUrl]"
+          },
+          "configurationFunction": {
+            "value": "[variables('CloudConnectorSetting').configurationFunction]"
+          },          
+		  "customerId": {
+            "value": "[variables('CloudConnectorSetting').customerId]"
+		  },
+		  "clientId": {
+            "value": "[variables('CloudConnectorSetting').clientId]"
+		  },
+		  "ClientSecret":{
+            "value":  "[variables('CloudConnectorSetting').ClientSecret]"
+		  },
+		  "ResourceLocationId":{
+            "value":  "[variables('CloudConnectorSetting').ResourceLocationId]"
+		  },
+		  "CustomCloudConnectorScriptUri":{
+ 		   "value": "[parameters('customCloudConnectorScriptUri')]"
+		  },
+		  "CustomCloudConnectorScriptArgs" :{
+		   "value": "[parameters('customCloudConnectorScriptArgs')]"
+		  }
+        }
+      }
+    }      
+  ]  
+}

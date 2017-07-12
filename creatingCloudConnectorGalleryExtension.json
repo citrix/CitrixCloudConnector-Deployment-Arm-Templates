@@ -1,0 +1,176 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {   
+    "publisher": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the marketplace publisher of the image to provision this machine on."
+      }
+    },   
+    "machineName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of this machine in Azure and on the network."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Specifies the Location for the deployment."
+      }
+    },      
+    // Credentials and domain
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the administrator for machines, Active Directory domain, NetScaler and XenApp. Exclusion list: 'admin','administrator'. Must be no more than 9 alphanumeric characters."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the password of the administrator for machines, Active Directory domain, NetScaler and XenApp."
+      }
+    },
+    "domainName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the Active Directory domain."
+      }
+    },
+    "domainUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name Existing domain Username that will be used to Join Domain."
+      }
+    },
+    "domainPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the Existing domain Password for Domain User that will be used to Join Domain."
+      }
+    },
+    "domainControllerPrivateIp": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the private IP of a domain controller on the virtual network."
+      }
+    },	
+    "artifactsLocationSasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the base location of the child templates and desired state configuration scripts."
+      }
+    },
+    "configurationFileUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the URI of the DSC configuration script."
+      }
+    },
+    "configurationFunction": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the function to be executed in the DSC configuration script."
+      }
+    },    
+	//Cloud Connector Settings
+	"customerId": {
+	  "type": "string",
+      "metadata": {
+        "description": "This is the customer ID available in the Citrix Cloud console on the API Access page (within Identity and Access Management)."
+      }
+	},
+	"clientId": {
+	  "type": "string",
+      "metadata": {
+        "description": "Found on the API Access page. This is the secure client ID an administrator can create."
+      }
+	},
+	"ClientSecret": {
+	  "type": "string",
+      "metadata": {
+        "description": "Found on the API Access page. This is the secure client secret available via download after a secure client is created."
+      }
+	},
+	"ResourceLocationId": {
+	  "type": "string",
+      "metadata": {
+        "description": "This ID can be retrieved on the Resource Locations page using the ID button."
+      }
+	},
+	"CustomCloudConnectorScriptUri": {
+	  "type": "string",
+      "metadata": {
+        "description": "If there is custom Script that needs to run on Connector."
+		}
+    },
+	"CustomCloudConnectorScriptArgs": {
+	  "type": "string",
+      "metadata": {
+        "description": "If there are any Arguments to Custom Script that needs to be passed."
+		}
+    }
+  },
+  "variables": {
+
+  },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('machineName'),'/configureController')]",
+            "tags": {
+                "displayName": "ControllerConfiguration"
+            },
+            "apiVersion": "2015-06-15",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.19",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "modulesUrl": "[parameters('configurationFileUrl')]",
+                    "sasToken": "[parameters('artifactsLocationSasToken')]",
+                    "configurationFunction": "[parameters('configurationFunction')]",
+                    "Properties": {
+                        "Admincreds": {
+                            "UserName": "[parameters('adminUsername')]",
+                            "Password": "PrivateSettingsRef:adminPassword"
+                        },
+						"DomainCreds": {
+                            "UserName": "[parameters('domainUsername')]",
+                            "Password": "PrivateSettingsRef:domainPassword"
+                        },
+						"DomainName": "[parameters('domainName')]",
+                        "DomainControllerIp": "[parameters('domainControllerPrivateIp')]",
+						"CustomerId": "[parameters('CustomerId')]",
+                        "ClientId": "[parameters('ClientId')]",
+                        "ClientSecret": "[parameters('ClientSecret')]",
+                        "customerResourceLocationsId": "[parameters('ResourceLocationId')]",						
+						"CustomCloudConnectorScriptUri": "[parameters('CustomCloudConnectorScriptUri')]",
+						"CustomCloudConnectorScriptArgs": "[parameters('CustomCloudConnectorScriptArgs')]"
+                    }
+                },
+                "protectedSettings": {
+                    "Items": {
+                        "AdminPassword": "[parameters('adminPassword')]",
+						"DomainPassword": "[parameters('domainPassword')]"
+                    }
+                }
+            }
+        }
+    ],
+  "outputs": {    
+    "machineId": {
+      "type": "string",
+      "value": "[variables('machineId')]"
+    },
+    "nicId": {
+      "type": "string",
+      "value": "[variables('nicId')]"
+    }
+  }
+}
