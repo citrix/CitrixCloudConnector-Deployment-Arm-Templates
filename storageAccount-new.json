@@ -5,6 +5,7 @@
   "parameters": {
     "location": {
       "type": "string",
+	  "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "Description": "Specifies the location of the storage account."
       }

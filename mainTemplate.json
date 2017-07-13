@@ -108,7 +108,7 @@
         "artifactsBaseUrl": "",
         "description": "Specifies the base location of the child templates and desired state configuration scripts."
       },
-      "defaultValue": "https://github.com/citrix/CitrixCloudConnector-Deployment-Arm-Templates"
+      "defaultValue": "https://github.com/citrix/CitrixCloudConnector-Deployment-Arm-Templates/blob/master"
     },
     "artifactsBaseUrlSasToken": {
       "type": "securestring",
