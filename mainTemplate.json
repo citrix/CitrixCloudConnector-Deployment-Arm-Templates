@@ -69,7 +69,7 @@
     "domainName": {
       "type": "string",      
       "metadata": {
-        "description": "Specifies the name of the newly created Active Directory domain."
+        "description": "Specifies the name of the existing Active Directory domain."
       }
     },
 	"domainUsername": {
